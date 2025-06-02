@@ -21,7 +21,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
 import { Link } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import Notificaciones from './notificaciones';
+import Notificaciones from './notificaciones_popup';
 
 const drawerWidth = 240;
 

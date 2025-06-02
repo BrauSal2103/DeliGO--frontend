@@ -20,8 +20,8 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
 import { Link } from 'react-router-dom';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Notificaciones from './notificaciones';
 
 const drawerWidth = 240;
 
@@ -94,9 +94,9 @@ export default function Sidebar() {
       <MuiAppBar
         position="fixed"
         sx={{
-          backgroundColor: 'green', // Color azul personalizado
+          backgroundColor: 'green',
           color: 'white',
-          zIndex: 1201,
+          zIndex: (theme) => theme.zIndex.drawer + 1,
           transition: 'width 225ms ease-out, margin 225ms ease-out',
           ...(openDrawer && {
             marginLeft: drawerWidth,
@@ -105,12 +105,12 @@ export default function Sidebar() {
         }}
       >
         <Toolbar>
-          <IconButton
+           <IconButton
             color="inherit"
             aria-label="open drawer"
             onClick={handleDrawerOpen}
             edge="start"
-            sx={{ marginRight: 5, ...(openDrawer && { display: 'none' }) }}
+            sx={{ marginRight: 5 }} // Quita el `...(openDrawer && { display: 'none' })` si lo tenías.
           >
             <MenuIcon />
           </IconButton>
@@ -126,16 +126,10 @@ export default function Sidebar() {
             }}>
               DeliGO
           </Button>
-          <IconButton
-            color="inherit"
-            aria-label="notificaciones"
-            size="large"
-            component={Link}
-            to="/notificaciones"
-            sx={{ marginLeft: 'auto' }}
-            >
-            <NotificationsIcon />
-          </IconButton>
+          <Box sx={{ flexGrow: 1 }} />
+
+          {/* Your Notificaciones component, which contains the bell icon */}
+          <Notificaciones />
         </Toolbar>
       </MuiAppBar>
 
@@ -324,9 +318,13 @@ export default function Sidebar() {
         </List>
       </MuiDrawer>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <div style={{ height: 64 }} />
-        {/* Aquí va el contenido principal */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+        }}
+      >
+        {/* Here goes your main content */}
       </Box>
     </Box>
   );

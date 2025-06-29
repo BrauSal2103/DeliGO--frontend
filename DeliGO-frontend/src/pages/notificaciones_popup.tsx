@@ -188,7 +188,7 @@ const Notificaciones: React.FC = () => {
               borderRadius: '8px'
             }}
           >
-            View All Notifications
+            Ver todas las notificaciones
           </Button>
         </Box>
       </Menu>

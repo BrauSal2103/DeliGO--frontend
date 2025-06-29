@@ -135,43 +135,47 @@ export default function Sidebar() {
 
       {/* Drawer */}
       <MuiDrawer
-        variant="permanent"
+        variant="temporary"
         open={openDrawer}
+        onClose={handleDrawerClose}
+        ModalProps={{
+          keepMounted: true, // Mejora el rendimiento en móviles
+        }}
         sx={{
           flexShrink: 0,
           whiteSpace: 'nowrap',
           boxSizing: 'border-box',
           ...(openDrawer
-            ? {
-                width: drawerWidth,
-                '& .MuiDrawer-paper': {
-                  width: drawerWidth,
-                  transition: 'width 225ms ease-out',
-                  overflowX: 'hidden',
-                },
-              }
-            : {
-                width: 56,
-                '& .MuiDrawer-paper': {
-                  width: 56,
-                  transition: 'width 195ms ease-in',
-                  overflowX: 'hidden',
-                },
-              }),
+        ? {
+        width: drawerWidth,
+        '& .MuiDrawer-paper': {
+          width: drawerWidth,
+          transition: 'width 225ms ease-out',
+          overflowX: 'hidden',
+        },
+          }
+        : {
+        width: 56,
+        '& .MuiDrawer-paper': {
+          width: 56,
+          transition: 'width 195ms ease-in',
+          overflowX: 'hidden',
+        },
+          }),
         }}
       >
         {/* Encabezado del Drawer */}
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            height: 64,
-            padding: '0 8px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        height: 64,
+        padding: '0 8px',
           }}
         >
           <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon />
+        <ChevronLeftIcon />
           </IconButton>
         </div>
 
@@ -180,30 +184,31 @@ export default function Sidebar() {
         {/* Cliente */}
         <List>
           <ListItem disablePadding sx={{ display: 'block' }}>
-            <ListItemButton onClick={() => {
-              if (!openDrawer) setOpenDrawer(true);
-              setOpenCliente(!openCliente);
-            }} sx={{minHeight: 48, px: 2.5, justifyContent: openDrawer ? 'initial' : 'center'}}>
-              <ListItemIcon sx={{minWidth: 0, mr: openDrawer ? 3 : 'auto', justifyContent: 'center'}}>
-                <AccountBoxIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Cliente"} sx={{ opacity: openDrawer ? 1 : 0 }} />
-              {openDrawer && (openCliente ? <ExpandLess /> : <ExpandMore />)}
-            </ListItemButton>
-            <Collapse in={openCliente} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {Object.entries(clienteRoutes).map(([text, path]) => (
-                  <ListItemButton
-                    key={text}
-                    component={Link}
-                    to={path}
-                    sx={{ pl: 4 }}
-                  >
-                    <ListItemText primary={text} />
-                  </ListItemButton>
-                ))}
-              </List>
-            </Collapse>
+        <ListItemButton onClick={() => {
+          if (!openDrawer) setOpenDrawer(true);
+          setOpenCliente(!openCliente);
+        }} sx={{minHeight: 48, px: 2.5, justifyContent: openDrawer ? 'initial' : 'center'}}>
+          <ListItemIcon sx={{minWidth: 0, mr: openDrawer ? 3 : 'auto', justifyContent: 'center'}}>
+            <AccountBoxIcon />
+          </ListItemIcon>
+          <ListItemText primary={"Cliente"} sx={{ opacity: openDrawer ? 1 : 0 }} />
+          {openDrawer && (openCliente ? <ExpandLess /> : <ExpandMore />)}
+        </ListItemButton>
+        <Collapse in={openCliente} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {Object.entries(clienteRoutes).map(([text, path]) => (
+          <ListItemButton
+            key={text}
+            component={Link}
+            to={path}
+            sx={{ pl: 4 }}
+            onClick={handleDrawerClose}
+          >
+            <ListItemText primary={text} />
+          </ListItemButton>
+            ))}
+          </List>
+        </Collapse>
           </ListItem>
         </List>
 
@@ -212,30 +217,31 @@ export default function Sidebar() {
         {/* Repartidor */}
         <List>
           <ListItem disablePadding sx={{ display: 'block' }}>
-            <ListItemButton onClick={() => {
-              if (!openDrawer) setOpenDrawer(true);
-              setOpenRepartidor(!openRepartidor);
-            }} sx={{minHeight: 48, px: 2.5, justifyContent: openDrawer ? 'initial' : 'center'}}>
-              <ListItemIcon sx={{minWidth: 0, mr: openDrawer ? 3 : 'auto', justifyContent: 'center'}}>
-                <DeliveryDiningIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Repartidor"} sx={{ opacity: openDrawer ? 1 : 0 }} />
-              {openDrawer && (openRepartidor ? <ExpandLess /> : <ExpandMore />)}
-            </ListItemButton>
-            <Collapse in={openRepartidor} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {Object.entries(repartidorRoutes).map(([text, path]) => (
-                  <ListItemButton
-                    key={text}
-                    component={Link}
-                    to={path}
-                    sx={{ pl: 4 }}
-                  >
-                    <ListItemText primary={text} />
-                  </ListItemButton>
-                ))}
-              </List>
-            </Collapse>
+        <ListItemButton onClick={() => {
+          if (!openDrawer) setOpenDrawer(true);
+          setOpenRepartidor(!openRepartidor);
+        }} sx={{minHeight: 48, px: 2.5, justifyContent: openDrawer ? 'initial' : 'center'}}>
+          <ListItemIcon sx={{minWidth: 0, mr: openDrawer ? 3 : 'auto', justifyContent: 'center'}}>
+            <DeliveryDiningIcon />
+          </ListItemIcon>
+          <ListItemText primary={"Repartidor"} sx={{ opacity: openDrawer ? 1 : 0 }} />
+          {openDrawer && (openRepartidor ? <ExpandLess /> : <ExpandMore />)}
+        </ListItemButton>
+        <Collapse in={openRepartidor} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {Object.entries(repartidorRoutes).map(([text, path]) => (
+          <ListItemButton
+            key={text}
+            component={Link}
+            to={path}
+            sx={{ pl: 4 }}
+            onClick={handleDrawerClose}
+          >
+            <ListItemText primary={text} />
+          </ListItemButton>
+            ))}
+          </List>
+        </Collapse>
           </ListItem>
         </List>
 
@@ -244,30 +250,31 @@ export default function Sidebar() {
         {/* Gerente */}
         <List>
           <ListItem disablePadding sx={{ display: 'block' }}>
-            <ListItemButton onClick={() => {
-              if (!openDrawer) setOpenDrawer(true);
-              setOpenGerente(!openGerente);
-            }} sx={{minHeight: 48, px: 2.5, justifyContent: openDrawer ? 'initial' : 'center'}}>
-              <ListItemIcon sx={{minWidth: 0, mr: openDrawer ? 3 : 'auto', justifyContent: 'center'}}>
-                <BadgeIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Gerente"} sx={{ opacity: openDrawer ? 1 : 0 }} />
-              {openDrawer && (openGerente ? <ExpandLess /> : <ExpandMore />)}
-            </ListItemButton>
-            <Collapse in={openGerente} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {Object.entries(gerenteRoutes).map(([text, path]) => (
-                  <ListItemButton
-                    key={text}
-                    component={Link}
-                    to={path}
-                    sx={{ pl: 4 }}
-                  >
-                    <ListItemText primary={text} />
-                  </ListItemButton>
-                ))}
-              </List>
-            </Collapse>
+        <ListItemButton onClick={() => {
+          if (!openDrawer) setOpenDrawer(true);
+          setOpenGerente(!openGerente);
+        }} sx={{minHeight: 48, px: 2.5, justifyContent: openDrawer ? 'initial' : 'center'}}>
+          <ListItemIcon sx={{minWidth: 0, mr: openDrawer ? 3 : 'auto', justifyContent: 'center'}}>
+            <BadgeIcon />
+          </ListItemIcon>
+          <ListItemText primary={"Gerente"} sx={{ opacity: openDrawer ? 1 : 0 }} />
+          {openDrawer && (openGerente ? <ExpandLess /> : <ExpandMore />)}
+        </ListItemButton>
+        <Collapse in={openGerente} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {Object.entries(gerenteRoutes).map(([text, path]) => (
+          <ListItemButton
+            key={text}
+            component={Link}
+            to={path}
+            sx={{ pl: 4 }}
+            onClick={handleDrawerClose}
+          >
+            <ListItemText primary={text} />
+          </ListItemButton>
+            ))}
+          </List>
+        </Collapse>
           </ListItem>
         </List>
 
@@ -276,44 +283,46 @@ export default function Sidebar() {
         {/* Desarrollador */}
         <List>
           <ListItem disablePadding sx={{ display: 'block' }}>
-            <ListItemButton onClick={() => {
-              if (!openDrawer) setOpenDrawer(true);
-              setOpenDesarrollador(!openDesarrollador);
-            }} sx={{minHeight: 48, px: 2.5, justifyContent: openDrawer ? 'initial' : 'center'}}>
-              <ListItemIcon sx={{minWidth: 0, mr: openDrawer ? 3 : 'auto', justifyContent: 'center'}}>
-                <AdminPanelSettingsIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Desarrollador"} sx={{ opacity: openDrawer ? 1 : 0 }} />
-              {openDrawer && (openDesarrollador ? <ExpandLess /> : <ExpandMore />)}
-            </ListItemButton>
-            <Collapse in={openDesarrollador} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {Object.entries(developerRoutes).map(([text, path]) => (
-                  <ListItemButton
-                    key={text}
-                    component={Link}
-                    to={path}
-                    sx={{ pl: 4 }}
-                  >
-                    <ListItemText primary={text} />
-                  </ListItemButton>
-                ))}
-              </List>
-            </Collapse>
+        <ListItemButton onClick={() => {
+          if (!openDrawer) setOpenDrawer(true);
+          setOpenDesarrollador(!openDesarrollador);
+        }} sx={{minHeight: 48, px: 2.5, justifyContent: openDrawer ? 'initial' : 'center'}}>
+          <ListItemIcon sx={{minWidth: 0, mr: openDrawer ? 3 : 'auto', justifyContent: 'center'}}>
+            <AdminPanelSettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary={"Desarrollador"} sx={{ opacity: openDrawer ? 1 : 0 }} />
+          {openDrawer && (openDesarrollador ? <ExpandLess /> : <ExpandMore />)}
+        </ListItemButton>
+        <Collapse in={openDesarrollador} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {Object.entries(developerRoutes).map(([text, path]) => (
+          <ListItemButton
+            key={text}
+            component={Link}
+            to={path}
+            sx={{ pl: 4 }}
+            onClick={handleDrawerClose}
+          >
+            <ListItemText primary={text} />
+          </ListItemButton>
+            ))}
+          </List>
+        </Collapse>
           </ListItem>
         </List>
         <Divider />
         <List>
           <ListItem disablePadding sx={{ display: 'block' }}>
-            <ListItemButton onClick={() => {
-              if (!openDrawer) setOpenDrawer(true);}}
-              component={Link} to={"/perfil"}
-              sx={{minHeight: 48, px: 2.5, justifyContent: openDrawer ? 'initial' : 'center'}}>
-              <ListItemIcon sx={{minWidth: 0, mr: openDrawer ? 3 : 'auto', justifyContent: 'center'}}>
-                <AccountCircleIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Perfil"} sx={{ opacity: openDrawer ? 1 : 0 }} />
-            </ListItemButton>
+        <ListItemButton
+          onClick={handleDrawerClose}
+          component={Link}
+          to={"/perfil"}
+          sx={{minHeight: 48, px: 2.5, justifyContent: openDrawer ? 'initial' : 'center'}}>
+          <ListItemIcon sx={{minWidth: 0, mr: openDrawer ? 3 : 'auto', justifyContent: 'center'}}>
+            <AccountCircleIcon />
+          </ListItemIcon>
+          <ListItemText primary={"Perfil"} sx={{ opacity: openDrawer ? 1 : 0 }} />
+        </ListItemButton>
           </ListItem>
         </List>
       </MuiDrawer>
@@ -321,7 +330,7 @@ export default function Sidebar() {
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
+          flexGrow: 1, marginTop: 8, // Adjust this value based on your AppBar height
         }}
       >
         {/* Here goes your main content */}

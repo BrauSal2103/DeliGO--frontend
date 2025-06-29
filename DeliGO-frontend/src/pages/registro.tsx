@@ -6,13 +6,14 @@ import {
   Button,
   Paper,
   InputAdornment,
-  IconButton
+  IconButton,
 } from '@mui/material';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline'; // Icono para Nombre de Usuario
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'; // Icono para Contraseña
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined'; // Icono para Email
+import { Link } from 'react-router-dom'; // Importar Link de react-router-dom
 
 const Registro: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -58,7 +59,7 @@ const Registro: React.FC = () => {
 
   return (
     <Box
-      className="flex items-center justify-center min-h-screen"
+      className="flex items-center justify-center w-screen h-screen"
       sx={{
         background: 'linear-gradient(to bottom right, #e0baff, #c2a7f5)', // Degradado púrpura claro
       }}
@@ -179,6 +180,8 @@ const Registro: React.FC = () => {
             variant="contained"
             className="bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 rounded" // Tailwind classes
             sx={{ textTransform: 'none', mb: 2 }} // Material-UI styles
+            component={Link}
+            to={"/perfil"}
           >
             Registrarse
           </Button>
@@ -193,8 +196,8 @@ const Registro: React.FC = () => {
             variant="text"
             className="text-black hover:underline" // Tailwind classes
             sx={{ textTransform: 'none', fontWeight: 'bold' }} // Material-UI styles
-            onClick={() => console.log('Navegar a Iniciar Sesión')}
-            // Aquí puedes usar Link de react-router-dom: component={Link} to="/login"
+            component={Link}
+            to={"/login"}
           >
             Iniciar Sesión
           </Button>

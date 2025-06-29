@@ -17,10 +17,10 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Login attempt:', formData);
-  };
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   console.log('Login attempt:', formData);
+  // };
 
   return (
     <div className="flex items-center justify-center w-screen h-screen bg-gradient-to-br from-orange-300 to-sky-300">
@@ -151,9 +151,9 @@ const Login = () => {
           {/* Login Button */}
           <Button
             variant="contained"
-            onClick={handleSubmit}
+            // onClick={handleSubmit}
             component={Link}
-            to={"/cliente/catalogo"}
+            to={"/perfil"}
             sx={{
               textTransform: "none",
               backgroundColor: "#000000",

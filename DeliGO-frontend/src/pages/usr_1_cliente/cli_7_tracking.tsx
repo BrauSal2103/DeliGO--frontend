@@ -213,7 +213,7 @@ export default function OrderTrackingPage() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="w-screen h-screen bg-gray-50 flex flex-col">
         {/* Header */}
         <AppBar position="sticky" className="bg-white shadow-sm">
           <Toolbar className="px-4 lg:px-8">

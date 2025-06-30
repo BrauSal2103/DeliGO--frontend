@@ -180,7 +180,7 @@ export default function LocationPage() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div className="min-h-screen bg-gray-50 flex flex-col relative">
+      <div className="w-screen h-screen bg-gray-50 flex flex-col relative">
         {/* Header */}
         <AppBar position="sticky" className="bg-white shadow-sm z-20">
           <Toolbar className="px-4">

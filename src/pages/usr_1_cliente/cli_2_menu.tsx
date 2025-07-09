@@ -437,7 +437,7 @@ export default function RestaurantOrdering() {
                     fullWidth
                     size="large"
                     className="bg-orange-600 hover:bg-orange-700 py-3 text-lg font-semibold"
-                    onClick={}
+                    onClick={handleConfirmOrder}
                     disabled={!customerAddress.trim()}
                   >
                     Confirmar Pedido - ${getTotalPrice().toFixed(2)}

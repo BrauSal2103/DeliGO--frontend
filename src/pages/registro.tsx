@@ -13,12 +13,15 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'; // Icono para C
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined'; // Icono para Email
-import { Link } from 'react-router-dom'; // Importar Link de react-router-dom
+import { Link, useNavigate } from 'react-router-dom'; // Importar Link y useNavigate
+import { api } from './services/api';
 
 const Registro: React.FC = () => {
   const [formData, setFormData] = useState({
     nombreUsuario: '',
+    phone: '',
     email: '',
+    address: 'larco herrera',
     contrasena: '',
     confirmarContrasena: ''
   });
@@ -45,16 +48,35 @@ const Registro: React.FC = () => {
     event.preventDefault();
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica de validación y envío al backend
+    setError(null);
     if (formData.contrasena !== formData.confirmarContrasena) {
-      alert('Las contraseñas no coinciden.');
+      setError('Las contraseñas no coinciden.');
       return;
     }
-    console.log('Datos de registro:', formData);
-    alert('Usuario registrado con éxito (simulado)!');
-    // Redirigir al usuario o mostrar un mensaje de éxito
+    setLoading(true);
+    try {
+      // Ajusta los nombres de los campos según lo que espera tu backend
+      const payload = {
+        name: formData.nombreUsuario,
+        phone: formData.phone,
+        address: formData.address,
+        email: formData.email,
+        password: formData.contrasena
+      };
+      await api.post('/register', payload);
+      alert('Usuario registrado con éxito!');
+      navigate('/login');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Error al registrar usuario');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -173,6 +195,10 @@ const Registro: React.FC = () => {
             sx={{ mb: 4 }}
           />
 
+          {/* Mensaje de error */}
+          {error && (
+            <div style={{ color: 'red', marginBottom: 12, textAlign: 'center' }}>{error}</div>
+          )}
           {/* Botón Registrar */}
           <Button
             type="submit"
@@ -180,10 +206,9 @@ const Registro: React.FC = () => {
             variant="contained"
             className="bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 rounded" // Tailwind classes
             sx={{ textTransform: 'none', mb: 2 }} // Material-UI styles
-            component={Link}
-            to={"/perfil"}
+            disabled={loading}
           >
-            Registrarse
+            {loading ? 'Registrando...' : 'Registrarse'}
           </Button>
         </form>
 

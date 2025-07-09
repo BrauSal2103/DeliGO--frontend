@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import { Eye, EyeOff, User, Lock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, TextField, InputAdornment, IconButton, Box } from '@mui/material';
+import { api } from './services/api';
+
 
 const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -17,10 +22,27 @@ const Login = () => {
     });
   };
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   console.log('Login attempt:', formData);
-  // };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    
+    try {
+      const payload = {
+        address: formData.username,
+        password: formData.password
+      };
+      const response = await api.post('/login', payload);
+      localStorage.setItem('token', response.data.token);
+        
+      navigate('/perfil');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
+      // console.log(formData)
+    }
+  };
 
   return (
     <div className="flex items-center justify-center w-screen h-screen bg-gradient-to-br from-orange-300 to-sky-300">
@@ -48,7 +70,7 @@ const Login = () => {
         </div>
 
         {/* Login Form */}
-        <Box sx={{ width: '100%', maxWidth: '300px' }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: '300px' }}>
           {/* Username Field */}
           <TextField
             fullWidth
@@ -148,12 +170,15 @@ const Login = () => {
             }}
           />
 
+          {/* Mensaje de error */}
+          {error && (
+            <div style={{ color: 'red', marginBottom: 12, textAlign: 'center' }}>{error}</div>
+          )}
           {/* Login Button */}
           <Button
+            type="submit"
             variant="contained"
-            // onClick={handleSubmit}
-            component={Link}
-            to={"/perfil"}
+            disabled={loading}
             sx={{
               textTransform: "none",
               backgroundColor: "#000000",
@@ -165,7 +190,7 @@ const Login = () => {
                 backgroundColor: '#333333',
               },
             }}>
-            Ingresar
+            {loading ? 'Ingresando...' : 'Ingresar'}
           </Button>
 
           {/* Register Link */}

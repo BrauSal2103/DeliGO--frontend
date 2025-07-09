@@ -1,7 +1,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   AppBar,
   Toolbar,
@@ -40,6 +40,14 @@ const theme = createTheme({
   },
 })
 
+
+// Tipo para productos de la API
+interface Product {
+  id_product: number;
+  name: string;
+  price: number;
+}
+
 interface MenuItem {
   id: number
   name: string
@@ -56,99 +64,43 @@ interface CartItem extends MenuItem {
   quantity: number
 }
 
-const menuItems: MenuItem[] = [
-  {
-    id: 1,
-    name: "Pizza Margherita",
-    description: "Salsa de tomate, mozzarella fresca, albahaca y aceite de oliva",
-    price: 18.99,
-    category: "Pizzas",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.8,
-    prepTime: "15-20 min",
-    popular: true,
-  },
-  {
-    id: 2,
-    name: "Hamburguesa Clásica",
-    description: "Carne de res, lechuga, tomate, cebolla, pepinillos y salsa especial",
-    price: 15.99,
-    category: "Hamburguesas",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.6,
-    prepTime: "10-15 min",
-  },
-  {
-    id: 3,
-    name: "Ensalada César",
-    description: "Lechuga romana, pollo a la parrilla, crutones, parmesano y aderezo césar",
-    price: 12.99,
-    category: "Ensaladas",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.4,
-    prepTime: "5-10 min",
-  },
-  {
-    id: 4,
-    name: "Pasta Carbonara",
-    description: "Espaguetis con panceta, huevo, parmesano y pimienta negra",
-    price: 16.99,
-    category: "Pastas",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.7,
-    prepTime: "12-18 min",
-    popular: true,
-  },
-  {
-    id: 5,
-    name: "Tacos de Carnitas",
-    description: "Tres tacos con carnitas de cerdo, cebolla, cilantro y salsa verde",
-    price: 13.99,
-    category: "Mexicana",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.5,
-    prepTime: "8-12 min",
-  },
-  {
-    id: 6,
-    name: "Sushi Variado",
-    description: "Selección de 12 piezas de sushi fresco del día",
-    price: 24.99,
-    category: "Sushi",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.9,
-    prepTime: "15-25 min",
-  },
-  {
-    id: 7,
-    name: "Tiramisú",
-    description: "Postre italiano con café, mascarpone y cacao",
-    price: 7.99,
-    category: "Postres",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.6,
-    prepTime: "2-5 min",
-  },
-  {
-    id: 8,
-    name: "Coca Cola",
-    description: "Refresco de cola 500ml",
-    price: 2.99,
-    category: "Bebidas",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.2,
-    prepTime: "1 min",
-  },
-]
 
-const categories = ["Todos", "Pizzas", "Hamburguesas", "Ensaladas", "Pastas", "Mexicana", "Sushi", "Postres", "Bebidas"]
 
 export default function RestaurantOrdering() {
+  // Estado para productos
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  // Puedes cambiar la URL por la de tu API real
+  useEffect(() => {
+    fetch('http://localhost:8080/deligo/products')
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+        setLoadingProducts(false);
+      })
+      .catch(() => setLoadingProducts(false));
+  }, []);
+
+  // Adaptar productos de la API al formato de MenuItem
+  const menuItems: MenuItem[] = products.map((product) => ({
+    id: product.id_product,
+    name: product.name,
+    description: '', // Puedes agregar descripción si tu API la provee
+    price: product.price,
+    category: getCategoryFromName(product.name), // Asigna categorías según el nombre
+    image: '/placeholder.svg?height=200&width=300',
+    rating: 4.5, // Valor por defecto o puedes agregarlo si tu API lo provee
+    prepTime: '10-20 min', // Valor por defecto o puedes agregarlo si tu API lo provee
+  }));
+
+  const categories = ["Todos", "Pizzas", "Hamburguesas", "Ensaladas", "Pastas", "Mexicana", "Sushi", "Postres", "Bebidas"]
   const [selectedCategory, setSelectedCategory] = useState("Todos")
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [customerAddress, setCustomerAddress] = useState("")
   const [orderNotes, setOrderNotes] = useState("")
+
 
   const filteredItems =
     selectedCategory === "Todos" ? menuItems : menuItems.filter((item) => item.category === selectedCategory)
@@ -165,6 +117,19 @@ export default function RestaurantOrdering() {
       }
     })
   }
+
+  function getCategoryFromName(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes("pizza")) return "Pizzas";
+  if (n.includes("hamburguesa")) return "Hamburguesas";
+  if (n.includes("ensalada")) return "Ensaladas";
+  if (n.includes("pasta") || n.includes("tallarines")) return "Pastas";
+  if (n.includes("taco") || n.includes("mexic")) return "Mexicana";
+  if (n.includes("sushi")) return "Sushi";
+  if (n.includes("postre") || n.includes("helado") || n.includes("tiramisú") || n.includes("mazamorra")) return "Postres";
+  if (n.includes("bebida") || n.includes("jugo") || n.includes("coca") || n.includes("chicha") || n.includes("limonada") || n.includes("café")) return "Bebidas";
+  return "Otros";
+}
 
   const removeFromCart = (id: number) => {
     setCart((prevCart) => {
@@ -189,6 +154,38 @@ export default function RestaurantOrdering() {
 
   const handleCategoryChange = (_: React.SyntheticEvent, newValue: string) => {
     setSelectedCategory(newValue)
+  }
+
+  const handleConfirmOrder = () => {
+    if (customerAddress.trim() === "") {
+      alert("Por favor, ingresa una dirección de entrega.")
+      return
+    }
+    // Aquí puedes agregar la lógica para enviar el pedido al backend
+    alert(`Pedido confirmado! Total: $${getTotalPrice().toFixed(2)}\nDirección: ${customerAddress}\nNotas: ${orderNotes}`)
+    setCart([])
+    setIsCartOpen(false)
+    setCustomerAddress("")
+    setOrderNotes("")
+
+    // add logic to send order to backend
+    // fetch('http://localhost:8080/deligo/orders', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({
+    //     items: cart,
+    //     address: customerAddress,
+    //     notes: orderNotes,
+    //   }),
+    // })
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     alert(`Pedido confirmado! Total: $${getTotalPrice().toFixed(2)}\nDirección: ${customerAddress}\nNotas: ${orderNotes}`)
+    //     setCart([])
+    //     setIsCartOpen(false)
+    //     setCustomerAddress("")
+    //     setOrderNotes("")
+    //   })
   }
 
   return (
@@ -267,66 +264,76 @@ export default function RestaurantOrdering() {
 
         {/* Menu Items */}
         <main className="flex-grow max-w-7xl mx-auto w-full px-4 lg:px-8 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-            {filteredItems.map((item) => (
-              <Card key={item.id} className="h-full flex flex-col hover:shadow-xl transition-shadow duration-300">
-                <div className="relative">
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={item.image}
-                    alt={item.name}
-                    className="h-48 object-cover"
-                  />
-                  {item.popular && (
-                    <Chip
-                      label="Popular"
-                      color="primary"
-                      size="small"
-                      className="absolute top-2 left-2 bg-orange-600 text-white"
+          {loadingProducts ? (
+            <Typography>Cargando productos...</Typography>
+          ) : filteredItems.length === 0 ? (
+            <div className="text-center py-16">
+              <Typography variant="h6" className="text-gray-500 mb-2">
+                No se encontraron productos
+              </Typography>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+              {filteredItems.map((item) => (
+                <Card key={item.id} className="h-full flex flex-col hover:shadow-xl transition-shadow duration-300">
+                  <div className="relative">
+                    <CardMedia
+                      component="img"
+                      height="200"
+                      image={item.image}
+                      alt={item.name}
+                      className="h-48 object-cover"
                     />
-                  )}
-                </div>
-                <CardContent className="flex-grow p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <Typography variant="h6" component="h3" className="font-bold text-gray-900 flex-grow pr-2">
-                      {item.name}
+                    {item.popular && (
+                      <Chip
+                        label="Popular"
+                        color="primary"
+                        size="small"
+                        className="absolute top-2 left-2 bg-orange-600 text-white"
+                      />
+                    )}
+                  </div>
+                  <CardContent className="flex-grow p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <Typography variant="h6" component="h3" className="font-bold text-gray-900 flex-grow pr-2">
+                        {item.name}
+                      </Typography>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Rating value={item.rating} precision={0.1} size="small" readOnly />
+                        <Typography variant="body2" className="text-gray-600 text-sm">
+                          {item.rating}
+                        </Typography>
+                      </div>
+                    </div>
+                    <Typography variant="body2" className="text-gray-600 mb-3 line-clamp-2">
+                      {item.description}
                     </Typography>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <Rating value={item.rating} precision={0.1} size="small" readOnly />
-                      <Typography variant="body2" className="text-gray-600 text-sm">
-                        {item.rating}
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-1 text-gray-500">
+                        <Clock size={14} />
+                        <Typography variant="body2" className="text-sm">
+                          {item.prepTime}
+                        </Typography>
+                      </div>
+                      <Typography variant="h6" className="font-bold text-orange-600">
+                        ${item.price.toFixed(2)}
                       </Typography>
                     </div>
-                  </div>
-                  <Typography variant="body2" className="text-gray-600 mb-3 line-clamp-2">
-                    {item.description}
-                  </Typography>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-1 text-gray-500">
-                      <Clock size={14} />
-                      <Typography variant="body2" className="text-sm">
-                        {item.prepTime}
-                      </Typography>
-                    </div>
-                    <Typography variant="h6" className="font-bold text-orange-600">
-                      ${item.price.toFixed(2)}
-                    </Typography>
-                  </div>
-                </CardContent>
-                <CardActions className="p-4 pt-0">
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={() => addToCart(item)}
-                    className="bg-orange-600 hover:bg-orange-700 py-2 font-medium"
-                  >
-                    Agregar al carrito
-                  </Button>
-                </CardActions>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                  <CardActions className="p-4 pt-0">
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      onClick={() => addToCart(item)}
+                      className="bg-orange-600 hover:bg-orange-700 py-2 font-medium"
+                    >
+                      Agregar al carrito
+                    </Button>
+                  </CardActions>
+                </Card>
+              ))}
+            </div>
+          )}
         </main>
 
         {/* Cart Drawer */}
@@ -430,6 +437,7 @@ export default function RestaurantOrdering() {
                     fullWidth
                     size="large"
                     className="bg-orange-600 hover:bg-orange-700 py-3 text-lg font-semibold"
+                    onClick={}
                     disabled={!customerAddress.trim()}
                   >
                     Confirmar Pedido - ${getTotalPrice().toFixed(2)}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Plus,
   Search,
@@ -21,6 +21,7 @@ import {
   Users,
 } from "lucide-react"
 
+// Producto local
 interface Product {
   id: string
   name: string
@@ -34,97 +35,75 @@ interface Product {
   orders: number
 }
 
+// Producto de la API
+interface ApiProduct {
+  id_product: number;
+  name: string;
+  price: number;
+}
+
 export default function MenuManagement() {
-  //const [activeTab, setActiveTab] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [showFilters, setShowFilters] = useState(false)
   const [showProductModal, setShowProductModal] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [selectedCategory, setSelectedCategory] = useState("all")
 
+  // Estado para productos de la API
+  const [products, setProducts] = useState<Product[]>([])
+  const [loadingProducts, setLoadingProducts] = useState(true)
+
+  // Categorizar por nombre
+  function getCategoryFromName(name: string): string {
+    const n = name.toLowerCase();
+    if (n.includes("pizza")) return "pizzas";
+    if (n.includes("hamburguesa")) return "burgers";
+    if (n.includes("pasta") || n.includes("tallarines")) return "pasta";
+    if (n.includes("coca") || n.includes("bebida") || n.includes("jugo") || n.includes("chicha") || n.includes("limonada") || n.includes("café")) return "drinks";
+    if (n.includes("postre") || n.includes("helado") || n.includes("tiramisú") || n.includes("mazamorra") || n.includes("tiramisu")) return "desserts";
+    return "otros";
+  }
+
+  // Cargar productos desde la API
+  useEffect(() => {
+    fetch('http://localhost:8080/deligo/products')
+      .then(res => res.json())
+      .then((data: ApiProduct[]) => {
+        const adapted: Product[] = data.map((prod) => ({
+          id: prod.id_product.toString(),
+          name: prod.name,
+          description: '',
+          price: prod.price,
+          category: getCategoryFromName(prod.name),
+          image: '/placeholder.svg?height=100&width=100',
+          available: true,
+          preparationTime: 10,
+          rating: 4.5,
+          orders: 0,
+        }));
+        setProducts(adapted);
+        setLoadingProducts(false);
+      })
+      .catch(() => setLoadingProducts(false));
+  }, []);
+
   const categories = [
-    { id: "all", name: "Todos", count: 24 },
-    { id: "pizzas", name: "Pizzas", count: 8 },
-    { id: "burgers", name: "Hamburguesas", count: 6 },
-    { id: "pasta", name: "Pastas", count: 5 },
-    { id: "drinks", name: "Bebidas", count: 3 },
-    { id: "desserts", name: "Postres", count: 2 },
+    { id: "all", name: "Todos", count: 0 },
+    { id: "pizzas", name: "Pizzas", count: 0 },
+    { id: "burgers", name: "Hamburguesas", count: 0 },
+    { id: "pasta", name: "Pastas", count: 0 },
+    { id: "drinks", name: "Bebidas", count: 0 },
+    { id: "desserts", name: "Postres", count: 0 },
   ]
 
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: "1",
-      name: "Pizza Margherita",
-      description: "Pizza clásica con tomate, mozzarella y albahaca fresca",
-      price: 18.99,
-      category: "pizzas",
-      image: "/placeholder.svg?height=100&width=100",
-      available: true,
-      preparationTime: 15,
-      rating: 4.8,
-      orders: 156,
-    },
-    {
-      id: "2",
-      name: "Hamburguesa Clásica",
-      description: "Carne de res, lechuga, tomate, cebolla y salsa especial",
-      price: 14.5,
-      category: "burgers",
-      image: "/placeholder.svg?height=100&width=100",
-      available: true,
-      preparationTime: 12,
-      rating: 4.6,
-      orders: 203,
-    },
-    {
-      id: "3",
-      name: "Pasta Carbonara",
-      description: "Pasta con salsa cremosa, panceta y queso parmesano",
-      price: 16.75,
-      category: "pasta",
-      image: "/placeholder.svg?height=100&width=100",
-      available: false,
-      preparationTime: 18,
-      rating: 4.7,
-      orders: 89,
-    },
-    {
-      id: "4",
-      name: "Coca Cola",
-      description: "Bebida gaseosa 500ml",
-      price: 3.5,
-      category: "drinks",
-      image: "/placeholder.svg?height=100&width=100",
-      available: true,
-      preparationTime: 1,
-      rating: 4.2,
-      orders: 312,
-    },
-    {
-      id: "5",
-      name: "Tiramisu",
-      description: "Postre italiano con café y mascarpone",
-      price: 8.99,
-      category: "desserts",
-      image: "/placeholder.svg?height=100&width=100",
-      available: true,
-      preparationTime: 5,
-      rating: 4.9,
-      orders: 67,
-    },
-    {
-      id: "6",
-      name: "Pizza Pepperoni",
-      description: "Pizza con pepperoni y queso mozzarella",
-      price: 21.99,
-      category: "pizzas",
-      image: "/placeholder.svg?height=100&width=100",
-      available: true,
-      preparationTime: 15,
-      rating: 4.5,
-      orders: 134,
-    },
-  ])
+  // Actualizar los conteos de categorías
+  categories.forEach(cat => {
+    if (cat.id === "all") {
+      cat.count = products.length;
+    } else {
+      cat.count = products.filter(p => p.category === cat.id).length;
+    }
+  });
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -150,7 +129,27 @@ export default function MenuManagement() {
   }
 
   const handleDeleteProduct = (productId: string) => {
-    setProducts(products.filter((product) => product.id !== productId))
+    console.log("Eliminando producto con ID:", productId)
+
+    // Integrar con la API
+    fetch(`http://localhost:8080/deligo/products/${productId}`, {
+      method: 'DELETE',
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Error al eliminar el producto');
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log("Producto eliminado:", data);
+        
+      })
+      .catch(err => {
+        console.error("Error al eliminar producto:", err);
+      });
+      setProducts(products.filter((product) => product.id !== productId))
+    
   }
 
   const handleEditProduct = (product: Product) => {
@@ -182,7 +181,28 @@ export default function MenuManagement() {
                 image: newProduct.image,
               }
             : product,
-        ),
+        ))
+        // integrar con la API
+      fetch("http://localhost:8080/deligo/products", {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id_product: Number.parseInt(editingProduct.id),
+          name: newProduct.name,
+          price: Number.parseFloat(newProduct.price),
+        }),
+        
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log("Producto actualizado:", data);
+        })
+        .catch(err => {
+          console.error("Error al actualizar producto:", err);
+        }
+
       )
     } else {
       // Crear nuevo producto
@@ -199,6 +219,25 @@ export default function MenuManagement() {
         orders: 0,
       }
       setProducts([...products, product])
+
+      // integrar con la API
+      fetch('http://localhost:8080/deligo/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: product.name,
+          price: product.price,
+        }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log("Producto creado:", data);
+        })
+        .catch(err => {
+          console.error("Error al crear producto:", err);
+        });
     }
 
     setShowProductModal(false)
